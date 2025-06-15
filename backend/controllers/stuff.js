@@ -8,6 +8,9 @@ exports.createBook = (req, res, next) => {
   } else {
     bookObject = req.body;
   }
+
+  console.log("bookObject =", bookObject);
+
   delete bookObject._id;
   delete bookObject._userId;
   const book = new Book({
@@ -20,9 +23,7 @@ exports.createBook = (req, res, next) => {
 
   book
     .save()
-    .then(() => {
-      res.status(201).json({ message: "Objet enregistré !" });
-    })
+    .then(() => res.status(201).json({ message: "Objet enregistré !" }))
     .catch((error) => {
       console.log("Erreur Mongoose :", error);
       res.status(400).json({ error });
@@ -113,6 +114,14 @@ exports.getOneBook = (req, res, next) => {
 
 exports.getAllBooks = (req, res, next) => {
   Book.find()
+    .then((books) => res.status(200).json(books))
+    .catch((error) => res.status(400).json({ error }));
+};
+
+exports.getBestRatedBooks = (req, res, next) => {
+  Book.find()
+    .sort({ averageRating: -1 })
+    .limit(3)
     .then((books) => res.status(200).json(books))
     .catch((error) => res.status(400).json({ error }));
 };
